@@ -20,7 +20,11 @@ const postRegister = async (request: Request, response: Response) => {
 	console.log('checking if match');
 	console.log(bcrypt.compareSync(password, hash));
 
+	// actually should be on login route
 	const token = jwt.sign({ email }, 'secret');
+
+	// send a verification email on register
+	// the link should trigger a get request and have the token attached to url --> make verify email route
 
 	response.json({
 		message: 'received post register',
