@@ -1,7 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import database from './database';
+import database from './database/database';
 import registerRouter from './routes/registerRouter';
 
 const server = express();
