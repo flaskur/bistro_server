@@ -84,7 +84,7 @@ export default class Customer {
 			phone_number = $5,
 			address = $6,
 			verified = $7,
-			hash = $8,
+			hash = $8;
 		`;
 		const values = [
 			this.email,
@@ -97,10 +97,14 @@ export default class Customer {
 			this.hash,
 		];
 
-		const savePromise: Promise<boolean> = new Promise(async (resolve, reject) => {
-			const result = await database.query(text, values);
-			if (result) resolve(true);
-			reject(false); // not sure how this is handled
+		const savePromise: Promise<any> = new Promise(async (resolve, _) => {
+			// will resolve false if db query doesn't complete in 5 seconds
+			setTimeout(() => {
+				resolve(false);
+			}, 5000);
+
+			await database.query(text, values);
+			resolve(true);
 		});
 
 		return savePromise;

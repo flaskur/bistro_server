@@ -12,7 +12,7 @@ const postRegister = async (request: Request, response: Response) => {
 	const result = await customer.save(); // might fail, should res json on result === false
 	console.log(`result returned is ${result}`);
 	if (!result) {
-		response.json({
+		return response.json({
 			message: 'failed to save for post register',
 			error: true,
 		});
@@ -27,7 +27,7 @@ const postRegister = async (request: Request, response: Response) => {
 	// send a verification email on register
 	// the link should trigger a get request and have the token attached to url --> make verify email route
 
-	response.json({
+	return response.json({
 		message: 'received post register',
 		error: false,
 		token,
