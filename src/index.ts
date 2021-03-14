@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import database from './database/database';
 import registerRouter from './routes/registerRouter';
+import verifyRouter from './routes/verifyRouter';
 
 const server = express();
 
@@ -11,6 +12,7 @@ server.use(bodyParser.urlencoded({ extended: true }));
 server.use(cors());
 
 server.use('/register', registerRouter);
+server.use('/verify', verifyRouter);
 
 server.get('/banana', (request, response) => {
 	console.log('banana triggered');

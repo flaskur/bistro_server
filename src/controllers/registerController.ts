@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import nodemailer from 'nodemailer';
+
 import Customer from '../models/customer';
 
 const postRegister = async (request: Request, response: Response) => {
@@ -13,24 +15,46 @@ const postRegister = async (request: Request, response: Response) => {
 	console.log(`result returned is ${result}`);
 	if (!result) {
 		return response.json({
-			message: 'failed to save for post register',
+			errorMessage: 'failed to save for post register',
 			error: true,
 		});
 	}
 
-	console.log('checking if match');
-	console.log(bcrypt.compareSync(password, customer.password));
-
-	// actually should be on login route
-	const token = jwt.sign({ email: customer.email }, 'secret');
-
 	// send a verification email on register
 	// the link should trigger a get request and have the token attached to url --> make verify email route
+
+	const testAccount = await nodemailer.createTestAccount();
+
+	let transporter = nodemailer.createTransport({
+		host: 'smtp.ethereal.email',
+		port: 587,
+		secure: false, // true for 465, false for other ports
+		auth: {
+			user: testAccount.user, // generated ethereal user
+			pass: testAccount.pass, // generated ethereal password
+		},
+	});
+
+	let info = await transporter.sendMail({
+		from: 'fred',
+		to: 'flaskur@gmail.com',
+		subject: 'hey there fellow',
+		text: 'some plain text',
+		html: `
+			<div>
+				<h1 style="background-color: pink">verify header</h1>
+				<a href="http://localhost:3001/verify?hash=${customer.hash}">Verify Email</a>
+			</div>
+		`,
+	});
+
+	console.log('sent info', info.messageId);
+
+	console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
 
 	return response.json({
 		message: 'received post register',
 		error: false,
-		token,
 	});
 };
 
