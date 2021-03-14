@@ -2,8 +2,11 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
 
 import Customer from '../models/customer';
+
+dotenv.config();
 
 const postRegister = async (request: Request, response: Response) => {
 	const { email, password, firstName } = request.body;
@@ -23,26 +26,24 @@ const postRegister = async (request: Request, response: Response) => {
 	// send a verification email on register
 	// the link should trigger a get request and have the token attached to url --> make verify email route
 
-	const testAccount = await nodemailer.createTestAccount();
-
-	let transporter = nodemailer.createTransport({
-		host: 'smtp.ethereal.email',
-		port: 587,
-		secure: false, // true for 465, false for other ports
+	const transporter = nodemailer.createTransport({
+		service: 'gmail',
+		port: 8000,
+		secure: false,
 		auth: {
-			user: testAccount.user, // generated ethereal user
-			pass: testAccount.pass, // generated ethereal password
+			user: process.env.EMAIL,
+			pass: process.env.PASSWORD,
 		},
 	});
 
 	let info = await transporter.sendMail({
-		from: 'fred',
-		to: 'flaskur@gmail.com',
+		from: process.env.EMAIL,
+		to: process.env.EMAIL2,
 		subject: 'hey there fellow',
 		text: 'some plain text',
 		html: `
 			<div>
-				<h1 style="background-color: pink">verify header</h1>
+				<h1 style="background-color: pink">verify header3</h1>
 				<a href="http://localhost:3001/verify?hash=${customer.hash}">Verify Email</a>
 			</div>
 		`,
