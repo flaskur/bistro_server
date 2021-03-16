@@ -1,8 +1,10 @@
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import database from '../database/database';
+import { v4 } from 'uuid';
 
 export default class Customer {
+	private _id = '';
 	private _email = '';
 	private _password = ''; // hashed password
 	private _firstName = '';
@@ -13,6 +15,8 @@ export default class Customer {
 	private _hash: string; // random string for email verification
 
 	constructor(email: string, password: string) {
+		this._id = v4().replace(/-/g, '');
+
 		this._email = email;
 
 		const salt = bcrypt.genSaltSync(10);
@@ -20,7 +24,11 @@ export default class Customer {
 		this._password = hashedPassword;
 
 		this._hash = crypto.randomBytes(20).toString('hex'); // hex to avoid special chars
-		console.log(`the hash is ${this.hash}`);
+		console.log(`the hash is ${this.hash}, id is ${this.id}`);
+	}
+
+	get id(): string {
+		return this._id;
 	}
 
 	get email(): string {
@@ -74,19 +82,22 @@ export default class Customer {
 	async save(): Promise<boolean> {
 		// should be insert, on conflict update
 
+		console.log('attempting to save');
+
 		const text = `
-			insert into customer(email, password, first_name, last_name, phone_number, address, verified, hash)
-			values($1, $2, $3, $4, $5, $6, $7, $8)
-			on conflict (email) do update set 
-			password = $2,
-			first_name = $3,
-			last_name = $4,
-			phone_number = $5,
-			address = $6,
-			verified = $7,
-			hash = $8;
+			insert into customer(id, email, password, first_name, last_name, phone_number, address, verified, hash)
+			values($1, $2, $3, $4, $5, $6, $7, $8, $9)
+			on conflict (id, email) do update set
+			password = $3,
+			first_name = $4,
+			last_name = $5,
+			phone_number = $6,
+			address = $7,
+			verified = $8,
+			hash = $9;
 		`;
 		const values = [
+			this.id,
 			this.email,
 			this.password,
 			this.firstName,
@@ -104,6 +115,7 @@ export default class Customer {
 			}, 5000);
 
 			await database.query(text, values);
+
 			resolve(true);
 		});
 

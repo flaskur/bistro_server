@@ -43,8 +43,8 @@ const postRegister = async (request: Request, response: Response) => {
 		text: 'some plain text',
 		html: `
 			<div>
-				<h1 style="background-color: pink">verify header3</h1>
-				<a href="http://localhost:3001/verify?hash=${customer.hash}">Verify Email</a>
+				<h1 style="background-color: pink">verify header4</h1>
+				<a href="http://localhost:3001/verify?id=${customer.id}&hash=${customer.hash}">Verify Email</a>
 			</div>
 		`,
 	});

@@ -1,10 +1,13 @@
+import dotenv from 'dotenv';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+
 import database from './database/database';
 import registerRouter from './routes/registerRouter';
 import verifyRouter from './routes/verifyRouter';
 
+dotenv.config();
 const server = express();
 
 server.use(bodyParser.json());
@@ -22,18 +25,11 @@ server.get('/banana', (request, response) => {
 });
 
 const startup = async () => {
-	console.log(database);
 	await database.connect();
-	server.listen(3001, () => {
-		console.log('server started');
-	});
-
-	// clear database
 	await database.query('delete from customer');
 
-	// database.query('SELECT * from customer;', (err, res) => {
-	// 	let { email, password } = res.rows[0];
-	// 	console.log(email, password);
-	// });
+	server.listen(process.env.PORT, () => {
+		console.log(`server started on port ${process.env.PORT}`);
+	});
 };
 startup();
