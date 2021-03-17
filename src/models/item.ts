@@ -1,27 +1,7 @@
 import { v4 } from 'uuid';
-
-enum Size {
-	SMALL = 'SM',
-	LARGE = 'LG',
-	LUNCH = 'LCH',
-	DINNER = 'DNR',
-}
-
-enum Category {
-	SOUP = 'SOUP',
-	APPETIZER = 'APPETIZER',
-	SALAD = 'SALAD',
-	VEGETABLE = 'VEGETABLE',
-	CHINESE = 'CHINESE',
-	JAPANESE = 'JAPANESE',
-	THAI = 'THAI',
-	CURRY = 'CURRY',
-	RICE = 'RICE',
-	NOODLE = 'NOODLE',
-	HIBACHI = 'HIBACHI',
-	TRAY = 'TRAY',
-	COMBO = 'COMBO',
-}
+import Category from '../shared/category';
+import Size from '../shared/size';
+import database from '../database/database';
 
 export default class Item {
 	private _id: string;
@@ -68,5 +48,33 @@ export default class Item {
 
 	get description(): string {
 		return this._description;
+	}
+
+	async save(): Promise<boolean> {
+		const text = `
+			insert into item(id, name, category, size, price, spicy, description)
+			values($1, $2, $3, $4, $5, $6, $7);
+		`;
+		const values = [
+			this.id,
+			this.name,
+			this.category,
+			this.size,
+			this.price,
+			this.spicy,
+			this.description,
+		];
+
+		const savePromise: Promise<any> = new Promise(async (resolve, _) => {
+			setTimeout(() => {
+				resolve(false);
+			}, 5000);
+
+			await database.query(text, values);
+
+			resolve(true);
+		});
+
+		return savePromise;
 	}
 }

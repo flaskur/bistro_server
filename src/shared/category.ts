@@ -1,0 +1,17 @@
+enum Category {
+	SOUP = 'SOUP',
+	APPETIZER = 'APPETIZER',
+	SALAD = 'SALAD',
+	VEGETABLE = 'VEGETABLE',
+	CHINESE = 'CHINESE',
+	JAPANESE = 'JAPANESE',
+	THAI = 'THAI',
+	CURRY = 'CURRY',
+	RICE = 'RICE',
+	NOODLE = 'NOODLE',
+	HIBACHI = 'HIBACHI',
+	TRAY = 'TRAY',
+	COMBO = 'COMBO',
+}
+
+export default Category;
