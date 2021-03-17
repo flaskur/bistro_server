@@ -10,10 +10,15 @@ const postLogin = async (request: Request, response: Response) => {
 	const { email, password } = request.body;
 
 	const text = `
-		select customer.id, customer.email, customer.password from customer
+		select customer.id, customer.email, customer.password, customer.verified from customer
 		where customer.email = $1;
 	`;
-	const result = await database.query(text, email);
+	const values = [
+		email,
+	];
+	const result = await database.query(text, values);
+
+	// ** validate that the customer has verified their email
 
 	// VALIDATE CUSTOMER EXISTS
 	if (!result.rows.length) {
@@ -48,6 +53,7 @@ const postLogin = async (request: Request, response: Response) => {
 	return response.json({
 		success: true,
 		message: 'SUCCESSFUL CUSTOMER LOGIN',
+		token,
 	});
 };
 

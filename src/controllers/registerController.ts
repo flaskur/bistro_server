@@ -15,8 +15,11 @@ const postRegister = async (request: Request, response: Response) => {
 		select customer.email from customer 
 		where customer.email = $1
 	`;
-	const existingEmail = (await database.query(text, email)).rows.length > 0;
-	if (!existingEmail) {
+	const values = [
+		email,
+	];
+	const existingEmail = (await database.query(text, values)).rows.length > 0;
+	if (existingEmail) {
 		return response.json({
 			success: false,
 			message: 'EMAIL ALREADY EXISTS',
