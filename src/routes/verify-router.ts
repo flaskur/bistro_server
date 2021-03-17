@@ -1,5 +1,5 @@
 import express from 'express';
-import verifyController from '../controllers/verifyController';
+import verifyController from '../controllers/verify-controller';
 
 const verifyRouter = express.Router();
 

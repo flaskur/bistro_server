@@ -4,9 +4,9 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 
 import database from './database/database';
-import registerRouter from './routes/registerRouter';
-import loginRouter from './routes/loginRouter';
-import verifyRouter from './routes/verifyRouter';
+import registerRouter from './routes/register-router';
+import loginRouter from './routes/login-router';
+import verifyRouter from './routes/verify-router';
 
 dotenv.config();
 const server = express();
