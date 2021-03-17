@@ -6,13 +6,13 @@ import { v4 } from 'uuid';
 export default class Customer {
 	private _id = '';
 	private _email = '';
-	private _password = ''; // hashed password
+	private _password = ''; // HASHED PASSWORD
 	private _firstName = '';
 	private _lastName = '';
 	private _phoneNumber = '';
 	private _address = '';
 	private _verified = false;
-	private _hash: string; // random string for email verification
+	private _hash: string; // RANDOM STRING -> EMAIL VERIFICATION
 
 	constructor(email: string, password: string) {
 		this._id = v4().replace(/-/g, '');
@@ -23,8 +23,7 @@ export default class Customer {
 		const hashedPassword = bcrypt.hashSync(password, salt);
 		this._password = hashedPassword;
 
-		this._hash = crypto.randomBytes(20).toString('hex'); // hex to avoid special chars
-		console.log(`the hash is ${this.hash}, id is ${this.id}`);
+		this._hash = crypto.randomBytes(20).toString('hex'); // HEX AVOIDS SPECIAL CHARS URL
 	}
 
 	get id(): string {
@@ -78,12 +77,7 @@ export default class Customer {
 		return this._hash;
 	}
 
-	// create save method to add customer entry to database
 	async save(): Promise<boolean> {
-		// should be insert, on conflict update
-
-		console.log('attempting to save');
-
 		const text = `
 			insert into customer(id, email, password, first_name, last_name, phone_number, address, verified, hash)
 			values($1, $2, $3, $4, $5, $6, $7, $8, $9)
@@ -109,7 +103,7 @@ export default class Customer {
 		];
 
 		const savePromise: Promise<any> = new Promise(async (resolve, _) => {
-			// will resolve false if db query doesn't complete in 5 seconds
+			// RESOLVE FALSE ON HANG FOR 5 SECONDS
 			setTimeout(() => {
 				resolve(false);
 			}, 5000);
