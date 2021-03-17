@@ -1,6 +1,4 @@
 import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 
@@ -13,8 +11,11 @@ const postRegister = async (request: Request, response: Response) => {
 	const { email, password } = request.body;
 
 	// VALIDATE EXISTING EMAIL
-	const existingEmail =
-		(await database.query('select customer.email from customer where customer.email = $1', email)).rows.length > 0;
+	const text = `
+		select customer.email from customer 
+		where customer.email = $1
+	`;
+	const existingEmail = (await database.query(text, email)).rows.length > 0;
 	if (!existingEmail) {
 		return response.json({
 			success: false,

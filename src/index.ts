@@ -5,6 +5,7 @@ import cors from 'cors';
 
 import database from './database/database';
 import registerRouter from './routes/registerRouter';
+import loginRouter from './routes/loginRouter';
 import verifyRouter from './routes/verifyRouter';
 
 dotenv.config();
@@ -15,6 +16,7 @@ server.use(bodyParser.urlencoded({ extended: true }));
 server.use(cors());
 
 server.use('/register', registerRouter);
+server.use('/login', loginRouter);
 server.use('/verify', verifyRouter);
 
 server.get('/banana', (request, response) => {
