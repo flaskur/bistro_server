@@ -5,27 +5,35 @@ import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 
 import Customer from '../models/customer';
+import database from '../database/database';
 
 dotenv.config();
 
 const postRegister = async (request: Request, response: Response) => {
-	const { email, password, firstName } = request.body;
-	console.log(email, password, firstName);
+	const { email, password } = request.body;
 
-	const customer = new Customer(email, password);
-	customer.firstName = firstName;
-	const result = await customer.save(); // might fail, should res json on result === false
-	console.log(`result returned is ${result}`);
-	if (!result) {
+	// VALIDATE EXISTING EMAIL
+	const existingEmail =
+		(await database.query('select customer.email from customer where customer.email = $1', email)).rows.length > 0;
+	if (!existingEmail) {
 		return response.json({
-			errorMessage: 'failed to save for post register',
-			error: true,
+			success: false,
+			message: 'EMAIL ALREADY EXISTS',
 		});
 	}
 
-	// send a verification email on register
-	// the link should trigger a get request and have the token attached to url --> make verify email route
+	const customer = new Customer(email, password);
+	const result = await customer.save();
 
+	// VALIDATE CUSTOMER SAVED
+	if (!result) {
+		return response.json({
+			success: false,
+			message: 'FAILED TO REGISTER CUSTOMER',
+		});
+	}
+
+	// ** need to attach to ab email and send to email argument
 	const transporter = nodemailer.createTransport({
 		service: 'gmail',
 		port: 8000,
@@ -36,26 +44,21 @@ const postRegister = async (request: Request, response: Response) => {
 		},
 	});
 
-	let info = await transporter.sendMail({
+	await transporter.sendMail({
 		from: process.env.EMAIL,
 		to: process.env.EMAIL2,
-		subject: 'hey there fellow',
-		text: 'some plain text',
+		subject: 'Bistro Email Verification',
 		html: `
 			<div>
-				<h1 style="background-color: pink">verify header4</h1>
+				<h3 style="background-color: pink">Please click the link below to verify your email.</h3>
 				<a href="http://localhost:3001/verify?id=${customer.id}&hash=${customer.hash}">Verify Email</a>
 			</div>
 		`,
 	});
 
-	console.log('sent info', info.messageId);
-
-	console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-
 	return response.json({
-		message: 'received post register',
-		error: false,
+		success: true,
+		message: 'SUCCESSFUL REGISTER CUSTOMER',
 	});
 };
 
