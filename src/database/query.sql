@@ -27,18 +27,18 @@ create table item (
 	food_id text,
 	purchase_id text,
 	quantity int not null,
-	comment text,
+	comment text not null,
 	primary key (item_id, food_id, purchase_id)
 );
 
 create table purchase (
 	purchase_id text,
 	customer_id text,
-	type text,
-	subtotal number not null,
-	total number not null,
-	order_date date not null,
-	order_time date not null,
-	comment text,
+	purchase_type text not null,
+	subtotal real not null,
+	total real not null,
+	purchase_date date not null,
+	purchase_time date not null,
+	comment text not null,
 	primary key (purchase_id, customer_id)
 );

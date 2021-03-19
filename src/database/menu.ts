@@ -6,8 +6,6 @@ import database from './database';
 // SCRIPT INTENDED FOR RUNNING BEFORE SERVER START
 const fillMenu = async () => {
 	await database.connect();
-	await database.query('delete from food');
-
 	// CREATE ALL ITEM CLASSES AND SAVE
 
 	await new Food('Miso Soup', Category.SOUP, Size.SMALL, 1.99, false).save();

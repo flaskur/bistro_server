@@ -1,4 +1,5 @@
 import { v4 } from 'uuid';
+import database from '../database/database';
 
 export default class Item {
 	private _itemId: string;
@@ -30,5 +31,31 @@ export default class Item {
 	}
 	get comment() {
 		return this._comment;
+	}
+
+	async save(): Promise<boolean> {
+		const text = `
+			insert into item(item_id, food_id, purchase_id, quantity, comment)
+			values($1, $2, $3, $4, $5);
+		`;
+		const values = [
+			this.itemId,
+			this.foodId,
+			this.purchaseId,
+			this.quantity,
+			this.comment,
+		];
+
+		const savePromise: Promise<any> = new Promise(async (resolve, _) => {
+			setTimeout(() => {
+				resolve(false);
+			}, 5000);
+
+			await database.query(text, values);
+
+			resolve(true);
+		});
+
+		return savePromise;
 	}
 }

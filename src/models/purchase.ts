@@ -1,4 +1,5 @@
 import { v4 } from 'uuid';
+import database from '../database/database';
 
 enum PurchaseType {
 	TAKE_OUT = 'TAKE OUT',
@@ -51,5 +52,33 @@ export default class Purchase {
 	}
 	get comment() {
 		return this._comment;
+	}
+
+	async save(): Promise<boolean> {
+		const text = `
+			insert into purchase(purchase_id, customer_id, purchase_type, subtotal, total, order_date, order_time, comment)
+			values($1, $2, $3, $4, $5, $6, $7, $8);
+		`;
+		const values = [
+			this.purchaseId,
+			this.customerId,
+			this.purchaseType,
+			this.subtotal,
+			this.total,
+			this.purchaseDate,
+			this.purchaseTime,
+		];
+
+		const savePromise: Promise<any> = new Promise(async (resolve, _) => {
+			setTimeout(() => {
+				resolve(false);
+			}, 5000);
+
+			await database.query(text, values);
+
+			resolve(true);
+		});
+
+		return savePromise;
 	}
 }

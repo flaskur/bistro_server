@@ -46,7 +46,7 @@ export default class Food {
 
 	async save(): Promise<boolean> {
 		const text = `
-			insert into item(food_id, name, category, size, price, spicy, description)
+			insert into food(food_id, name, category, size, price, spicy, description)
 			values($1, $2, $3, $4, $5, $6, $7);
 		`;
 		const values = [
