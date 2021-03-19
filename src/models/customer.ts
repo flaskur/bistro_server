@@ -4,7 +4,7 @@ import database from '../database/database';
 import { v4 } from 'uuid';
 
 export default class Customer {
-	private _id = '';
+	private _customerId = '';
 	private _email = '';
 	private _password = ''; // HASHED PASSWORD
 	private _firstName = '';
@@ -15,7 +15,7 @@ export default class Customer {
 	private _hash: string; // RANDOM STRING -> EMAIL VERIFICATION
 
 	constructor(email: string, password: string) {
-		this._id = v4().replace(/-/g, '');
+		this._customerId = v4().replace(/-/g, '');
 
 		this._email = email;
 
@@ -26,8 +26,8 @@ export default class Customer {
 		this._hash = crypto.randomBytes(20).toString('hex'); // HEX AVOIDS SPECIAL CHARS URL
 	}
 
-	get id(): string {
-		return this._id;
+	get customerId(): string {
+		return this._customerId;
 	}
 
 	get email(): string {
@@ -79,9 +79,9 @@ export default class Customer {
 
 	async save(): Promise<boolean> {
 		const text = `
-			insert into customer(id, email, password, first_name, last_name, phone_number, address, verified, hash)
+			insert into customer(customer_id, email, password, first_name, last_name, phone_number, address, verified, hash)
 			values($1, $2, $3, $4, $5, $6, $7, $8, $9)
-			on conflict (id, email) do update set
+			on conflict (customer_id, email) do update set
 			password = $3,
 			first_name = $4,
 			last_name = $5,
@@ -91,7 +91,7 @@ export default class Customer {
 			hash = $9;
 		`;
 		const values = [
-			this.id,
+			this.customerId,
 			this.email,
 			this.password,
 			this.firstName,

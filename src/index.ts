@@ -28,7 +28,6 @@ server.get('/banana', (request, response) => {
 
 const startup = async () => {
 	await database.connect();
-	await database.query('delete from customer');
 
 	server.listen(process.env.PORT, () => {
 		console.log(`server started on port ${process.env.PORT}`);
