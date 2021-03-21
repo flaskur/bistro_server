@@ -7,6 +7,7 @@ import database from './database/database';
 import registerRouter from './routes/register-router';
 import loginRouter from './routes/login-router';
 import verifyRouter from './routes/verify-router';
+import menuRouter from './routes/menu-router';
 
 dotenv.config();
 const server = express();
@@ -18,6 +19,7 @@ server.use(cors());
 server.use('/register', registerRouter);
 server.use('/login', loginRouter);
 server.use('/verify', verifyRouter);
+server.use('/menu', menuRouter);
 
 server.get('/banana', (request, response) => {
 	console.log('banana triggered');
