@@ -56,7 +56,7 @@ export default class Purchase {
 
 	async save(): Promise<boolean> {
 		const text = `
-			insert into purchase(purchase_id, customer_id, purchase_type, subtotal, total, order_date, order_time, comment)
+			insert into purchase(purchase_id, customer_id, purchase_type, subtotal, total, purchase_date, purchase_time, comment)
 			values($1, $2, $3, $4, $5, $6, $7, $8);
 		`;
 		const values = [
@@ -67,6 +67,7 @@ export default class Purchase {
 			this.total,
 			this.purchaseDate,
 			this.purchaseTime,
+			this.comment,
 		];
 
 		const savePromise: Promise<any> = new Promise(async (resolve, _) => {

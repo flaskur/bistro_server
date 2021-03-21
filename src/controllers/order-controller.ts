@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import Purchase from '../models/purchase';
 import Item from '../models/item';
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
@@ -20,7 +21,13 @@ const postOrder = async (request: Request, response: Response) => {
 	// consider adding CC info to customer table, or require it each time but don't save just include with email, extract from request body
 
 	// you should include name, phone, and address in request body form
-	const { token, cart, purchaseType } = request.body;
+	const { token, bodyCart, purchaseType } = request.body;
+
+	console.log(token, bodyCart, purchaseType);
+
+	const cart = JSON.parse(bodyCart);
+
+	console.log(cart);
 
 	if (!token) {
 		return response.json({
@@ -64,7 +71,57 @@ const postOrder = async (request: Request, response: Response) => {
 		}
 	}
 
-	// otherwise we should just send a confirmation email with the details to customer and email to bistro with order info, duplicate
+	const transporter = nodemailer.createTransport({
+		service: 'gmail',
+		port: 8000,
+		secure: false,
+		auth: {
+			user: process.env.EMAIL,
+			pass: process.env.PASSWORD,
+		},
+	});
+
+	// send to customer --> should include purchase details for renderCart or a separate method
+	await transporter.sendMail({
+		from: process.env.EMAIL,
+		to: process.env.EMAIL2,
+		subject: 'Bistro Order Confirmation',
+		html: `
+			<div>
+				<h3 style="background-color: pink">Bistro Order Confirmation</h3>
+				${renderCart(cart)} 
+			</div>
+		`,
+	});
+
+	// send to bistro
+	await transporter.sendMail({
+		from: process.env.EMAIL,
+		to: process.env.EMAIL,
+		subject: 'New Customer Order',
+		html: `
+			<div>
+				<h3 style="background-color: pink">Bistro Order Confirmation</h3>
+				${renderCart(cart)}
+			</div>
+		`,
+	});
+
+	return response.json({
+		success: true,
+		message: 'SUCCESSFUL POST ORDER',
+	});
+};
+
+// need to return a string
+const renderCart = (cart: ItemProps[]): string => {
+	let items = '';
+
+	cart.map(item => {
+		items += `<h3 style="background-color: pink">foodid ${item.foodId} quantity ${item.quantity} price ${item.price}</h3>\n`;
+	});
+
+	return items;
 };
 
 const orderController = {
@@ -72,6 +129,7 @@ const orderController = {
 };
 
 // let cart have price to make it easier
+// maybe should include name too
 interface ItemProps {
 	foodId: string;
 	quantity: number;

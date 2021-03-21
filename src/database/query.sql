@@ -38,7 +38,7 @@ create table purchase (
 	subtotal real not null,
 	total real not null,
 	purchase_date date not null,
-	purchase_time date not null,
+	purchase_time text not null,
 	comment text not null,
 	primary key (purchase_id, customer_id)
 );
