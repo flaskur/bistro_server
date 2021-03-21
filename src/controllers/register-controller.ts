@@ -55,7 +55,7 @@ const postRegister = async (request: Request, response: Response) => {
 		html: `
 			<div>
 				<h3 style="background-color: pink">Please click the link below to verify your email.</h3>
-				<a href="http://localhost:3001/verify?id=${customer.customerId}&hash=${customer.hash}">Verify Email</a>
+				<a href="http://localhost:3001/verify?customer_id=${customer.customerId}&hash=${customer.hash}">Verify Email</a>
 			</div>
 		`,
 	});

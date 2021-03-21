@@ -10,7 +10,7 @@ const postLogin = async (request: Request, response: Response) => {
 	const { email, password } = request.body;
 
 	const text = `
-		select customer.id, customer.email, customer.password, customer.verified from customer
+		select customer.customer_id, customer.email, customer.password, customer.verified from customer
 		where customer.email = $1;
 	`;
 	const values = [
@@ -41,7 +41,7 @@ const postLogin = async (request: Request, response: Response) => {
 	// SEND BACK A JWT FOR FRONT END SESSION AUTH
 	const token = jwt.sign(
 		{
-			id: result.rows[0].id,
+			customerId: result.rows[0].customer_id,
 			email,
 		},
 		process.env.JWT_KEY!, // technically possible to not exist if env not defined

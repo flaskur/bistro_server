@@ -2,14 +2,14 @@ import { Request, Response } from 'express';
 import database from '../database/database';
 
 const getVerify = async (request: Request, response: Response) => {
-	const { id, hash } = request.query;
+	const { customer_id, hash } = request.query;
 
 	const text = `
 		select customer.hash from customer
-		where customer.id = $1;
+		where customer.customer_id = $1;
 	`;
 	const values = [
-		id,
+		customer_id,
 	];
 
 	// VALIDATE EXISTING CUSTOMER
@@ -27,11 +27,11 @@ const getVerify = async (request: Request, response: Response) => {
 		const text = `
 			update customer
 			set verified = $1
-			where customer.id = $2
+			where customer.customer_id = $2
 		`;
 		const values = [
 			true,
-			id,
+			customer_id,
 		];
 
 		await database.query(text, values);
