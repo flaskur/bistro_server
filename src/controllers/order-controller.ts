@@ -8,27 +8,23 @@ import nodemailer from 'nodemailer';
 dotenv.config();
 
 const postOrder = async (request: Request, response: Response) => {
-	// need to create a purchase entry and all items in the cart
-	// we need to be passed the jwt token to verify customer id
-	// need shopping cart as an array of items, which need to be populated after purchase instance
 	// you need the type of order, and phone number + address for delivery. for takeout you just need your phone number
 	// might be wise to do phone verification instead or along with email. from a ux standpoint, id rather just add stuff to cart and deal with auth later.
 	// i add all the stuff i want, then it will prompt me to create an account / verify phone before ordering
 	// i think i should make the registration more extensive and require phone verification.
 	// we could just allow a fake phone to be input without verification, but at least their email needs to be valid.
 
-	// on success you should send confirmation email to user and to bistro, maybe generate pdf?
-	// consider adding CC info to customer table, or require it each time but don't save just include with email, extract from request body
-
 	// you should include name, phone, and address in request body form
-	const { token, bodyCart, purchaseType } = request.body;
+	// the order submit form would possibly have phone, credit card number, address, etc. but they can be auto filled if the profile was already set. only save if they go through profile.
+	const { token, bodyCart, purchaseType, phoneNumber, address } = request.body;
 
-	console.log(token, bodyCart, purchaseType);
+	console.log(token, bodyCart, purchaseType, phoneNumber, address);
 
 	const cart = JSON.parse(bodyCart);
 
 	console.log(cart);
 
+	// REQUEST BODY VALIDATION
 	if (!token) {
 		return response.json({
 			success: false,
@@ -41,8 +37,28 @@ const postOrder = async (request: Request, response: Response) => {
 			message: 'EMPTY CART',
 		});
 	}
+	if (!purchaseType) {
+		return response.json({
+			success: false,
+			message: 'EMPTY PURCHASE TYPE',
+		});
+	}
+	if (!phoneNumber) {
+		return response.json({
+			success: false,
+			message: 'EMPTY PHONE NUMBER',
+		});
+	}
+	if (purchaseType === 'DELIVERY') {
+		if (!address) {
+			return response.json({
+				success: false,
+				message: 'EMPTY ADDRESS',
+			});
+		}
+	}
 
-	const verifiedToken = jwt.verify(token, process.env.JWT_KEY!) as TokenShape; // this can fail, need to cast
+	const verifiedToken = jwt.verify(token, process.env.JWT_KEY!) as TokenShape; // NEED TO CAST TO ACCESS FIELDS BC VERIFY CAN FAIL
 	console.log(verifiedToken.customerId, verifiedToken.email);
 
 	const subtotal = cart.reduce((total: number, item: ItemProps) => {
@@ -51,15 +67,13 @@ const postOrder = async (request: Request, response: Response) => {
 	const purchase = new Purchase(verifiedToken.customerId, purchaseType, subtotal);
 	const result = await purchase.save();
 
-	// maybe group purchase and item saves together
+	// POSSIBLY CREATE ATOMIC TRANSACTION FOR BOTH DB INSERTS
 	if (!result) {
 		return response.json({
 			success: false,
 			message: 'FAILED PURCHASE SAVE',
 		});
 	}
-
-	// create items and add to table for records
 	for (let cartItem of cart) {
 		let item = new Item(cartItem.foodId, purchase.purchaseId, cartItem.quantity, cartItem.comment);
 		let result = await item.save();
@@ -84,7 +98,7 @@ const postOrder = async (request: Request, response: Response) => {
 	// send to customer --> should include purchase details for renderCart or a separate method
 	await transporter.sendMail({
 		from: process.env.EMAIL,
-		to: process.env.EMAIL2,
+		to: process.env.EMAIL2, // this should be verifiedToken.email --> change later
 		subject: 'Bistro Order Confirmation',
 		html: `
 			<div>

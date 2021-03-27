@@ -42,3 +42,7 @@ create table purchase (
 	comment text not null,
 	primary key (purchase_id, customer_id)
 );
+
+delete from customer;
+delete from item;
+delete from purchase;
