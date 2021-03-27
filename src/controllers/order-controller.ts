@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import Purchase from '../models/purchase';
 import Item from '../models/item';
 import nodemailer from 'nodemailer';
+import TokenShape from '../shared/token-shape';
 
 dotenv.config();
 
@@ -28,7 +29,7 @@ const postOrder = async (request: Request, response: Response) => {
 	if (!token) {
 		return response.json({
 			success: false,
-			message: 'INVALID AUTH TOKEN',
+			message: 'MISSING AUTH TOKEN',
 		});
 	}
 	if (!cart) {
@@ -58,7 +59,22 @@ const postOrder = async (request: Request, response: Response) => {
 		}
 	}
 
-	const verifiedToken = jwt.verify(token, process.env.JWT_KEY!) as TokenShape; // NEED TO CAST TO ACCESS FIELDS BC VERIFY CAN FAIL
+	// JWT VERIFY THROWS ERROR ON FAILURE AND EXPIRED TOKEN
+	let verifiedToken: TokenShape;
+	try {
+		verifiedToken = jwt.verify(token, process.env.JWT_KEY!) as TokenShape; // NEED TO CAST TO ACCESS FIELDS BC VERIFY CAN FAIL
+	} catch (e) {
+		return response.json({
+			success: false,
+			message: 'INVALID AUTH TOKEN',
+		});
+	}
+	if (!verifiedToken) {
+		return response.json({
+			success: false,
+			message: 'INVALID AUTH TOKEN',
+		});
+	}
 	console.log(verifiedToken.customerId, verifiedToken.email);
 
 	const subtotal = cart.reduce((total: number, item: ItemProps) => {
@@ -148,11 +164,6 @@ interface ItemProps {
 	foodId: string;
 	quantity: number;
 	price: number;
-}
-
-interface TokenShape {
-	customerId: string;
-	email: string;
 }
 
 export default orderController;

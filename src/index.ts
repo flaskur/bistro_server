@@ -9,6 +9,7 @@ import loginRouter from './routes/login-router';
 import verifyRouter from './routes/verify-router';
 import menuRouter from './routes/menu-router';
 import orderRouter from './routes/order-router';
+import profileRouter from './routes/profile-router';
 
 dotenv.config();
 const server = express();
@@ -22,6 +23,7 @@ server.use('/login', loginRouter);
 server.use('/verify', verifyRouter);
 server.use('/menu', menuRouter);
 server.use('/order', orderRouter);
+server.use('/profile', profileRouter);
 
 server.get('/banana', (request, response) => {
 	console.log('banana triggered');
