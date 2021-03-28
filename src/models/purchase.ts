@@ -1,10 +1,6 @@
 import { v4 } from 'uuid';
 import database from '../database/database';
-
-enum PurchaseType {
-	TAKE_OUT = 'TAKE OUT',
-	DELIVERY = 'DELIVERY',
-}
+import PurchaseType from '../shared/purchase-type';
 
 const PA_TAX_RATE = 1.06;
 
