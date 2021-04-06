@@ -11,10 +11,17 @@ const getMenu = async (_: Request, response: Response) => {
 		});
 	}
 
+	// RENAME OBJ KEY FIELD CAMELCASE
+	const menu = res.rows.map(row => {
+		row['foodId'] = row['food_id'];
+		delete row['food_id'];
+		return row;
+	});
+
 	return response.json({
 		success: true,
 		message: 'SUCCESSFUL MENU ACCESS',
-		menu: res.rows,
+		menu,
 	});
 };
 
